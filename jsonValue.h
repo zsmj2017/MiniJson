@@ -3,10 +3,8 @@
 #include "json.h"
 #include "jsonException.h"
 #include <variant>
-#include <cassert>
 
 namespace json {
-
 class JsonValue {
 public:
 	explicit JsonValue(nullptr_t val) :_val(val) {}

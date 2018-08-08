@@ -1,4 +1,8 @@
 #include "parse.h"
+#include <cstring>
+#include <cmath>
+#include <cstdlib>
+#include <stdexcept>
 
 namespace json {
 
