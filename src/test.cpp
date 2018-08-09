@@ -2,7 +2,7 @@
 #include <string>
 #include "json.h"
 
-using namespace json;
+using namespace miniJson;
 using namespace std;
 
 Json parseOk(const string& strJson) {
@@ -44,7 +44,12 @@ Json parseOk(const string& strJson) {
     EXPECT_EQ(json.toDouble(), expect); \
   } while (0)
 
-
+#define testString(expect, strJson)     \
+  do {                                  \
+    Json json = parseOk(strJson);       \
+    EXPECT_TRUE(json.isString());       \
+    EXPECT_EQ(json.toString(), expect); \
+  } while (0)
 
 TEST(Str2Json, JsonNull) {
 	testNull("null");
@@ -59,7 +64,7 @@ TEST(Str2Json, JsonBool) {
 TEST(Str2Json, JsonNumber) {
 	testNumber(0.0, "0");
 	testNumber(0.0, "-0");
-	testNumber(0.0, "-0.0");
+	testNumber(0.0, "0.0");
 	testNumber(1.0, "1");
 	testNumber(-1.0, "-1");
 	testNumber(1.5, "1.5");
@@ -91,6 +96,26 @@ TEST(Str2Json, JsonNumber) {
 	EXPECT_TRUE(json.isNumber());
 	json = Json(3.1415);
 	EXPECT_EQ(3.1415, json.toDouble());
+}
+
+TEST(Str2Json, JsonString) {
+  testString("", "\"\"");
+  testString("Hello", "\"Hello\"");
+  testString("Hello\nWorld", "\"Hello\\nWorld\"");
+  testString("\" \\ / \b \f \n \r \t", "\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\"");
+  string s = "Hello";
+  s.push_back('\0');
+  s += "World";
+  testString(s, "\"Hello\\u0000World\"");
+  testString("\x24", "\"\\u0024\"");
+  testString("\xC2\xA2", "\"\\u00A2\"");
+  testString("\xE2\x82\xAC", "\"\\u20AC\"");
+  testString("\xF0\x9D\x84\x9E", "\"\\uD834\\uDD1E\"");
+  testString("\xF0\x9D\x84\x9E", "\"\\ud834\\udd1e\"");
+  string errMsg;
+  Json json = Json::parse("\"something\"", errMsg);
+  json = Json("another thing");
+  EXPECT_EQ(json.toString(), "another thing");
 }
 
 TEST(Error, InvalidValue) {
