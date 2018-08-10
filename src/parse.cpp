@@ -1,16 +1,16 @@
 #include "parse.h"
-#include <cstring>
-#include <cmath>
-#include <cstdlib>
-#include <stdexcept>
-#include <cassert>
+#include <cstring>   // strncmp
+#include <cmath>     // Huge_Val
+#include <cstdlib>   // strtod
+#include <stdexcept> // runtime_error
+#include <cassert>   // assert
 
 namespace miniJson {
 
 constexpr bool is1to9(char ch) { return ch >= '1' && ch <= '9'; }
 constexpr bool is0to9(char ch) { return ch >= '0' && ch <= '9'; }
 
-
+// skip all whitespace
 void Parser::parseWhitespace() noexcept {
 	while (*_curr == ' ' || *_curr == '\t' || *_curr == '\r' || *_curr == '\n')
 		++_curr;
@@ -22,10 +22,13 @@ void Parser::error(const std::string & msg) const{
 }
 
 Json Parser::parse() {
+	// JSON-text = ws value ws
+	// ws = *(%x20 / %x09 / %x0A / %x0D)
 	parseWhitespace();
 	Json json = parseValue();
 	parseWhitespace();
 	if (*_curr)
+		// some character still exists after the end whitespace 
 		error("ROOT NOT SINGULAR");
 	return json;
 }
@@ -36,12 +39,14 @@ Json Parser::parseValue() {
 	case 't': return parseLiteral("true");
 	case 'f': return parseLiteral("false");
 	case '\"': return parseString();
+	case '[': return parseArray();
 	case '\0': error("EXPECT VALUE");
 	default: return parseNumber();
 	}
 }
 
 Json Parser::parseLiteral(const std::string & literal){
+	// try to parse null && true && false
 	if (strncmp(_curr, literal.c_str(), literal.size())) 
 		error("INVALID VALUE");
 	_curr += literal.size();
@@ -60,10 +65,10 @@ Json Parser::parseNumber(){
 	else {
 		if (!is1to9(*_curr)) 
 			error("INVALID VALUE");
-		while (is0to9(*++_curr));
+		while (is0to9(*++_curr));   // pass all number character
 	}
 	if (*_curr== '.') {
-		if (!is0to9(*++_curr)) 
+		if (!is0to9(*++_curr))  // there must be a number character after '.'
 			error("INVALID VALUE");
 		while (is0to9(*++_curr));
 	}
@@ -75,6 +80,8 @@ Json Parser::parseNumber(){
 			error("INVALID VALUE");
 		while (is0to9(*++_curr));
 	}
+	//When we make sure that the current text is a number,
+	//call the library function strtod
 	double val = strtod(_start,nullptr);
 	if (fabs(val) == HUGE_VAL) 
 		error("NUMBER TOO BIG");
@@ -161,4 +168,28 @@ Json Parser::parseString(){
 		}
 	}
 }
+
+Json Parser::parseArray(){
+	Json::_array arr;
+	++_curr;  // skip '['
+	parseWhitespace();
+	if (*_curr == ']') {
+		_start = ++_curr;
+		return Json(arr);
+	}
+	while (1) {
+		parseWhitespace();
+		arr.push_back(parseValue());// recursive
+		parseWhitespace();
+		if (*_curr == ',')
+			++_curr;
+		else if (*_curr == ']') {
+			_start = ++_curr;
+			return Json(arr);
+		}
+		else
+			error("MISS COMMA OR SQUARE BRACKET");
+	}
 }
+
+}// namespace miniJson

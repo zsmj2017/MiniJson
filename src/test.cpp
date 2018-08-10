@@ -118,6 +118,43 @@ TEST(Str2Json, JsonString) {
   EXPECT_EQ(json.toString(), "another thing");
 }
 
+TEST(Str2Json, JsonArray) {
+	Json json = parseOk("[ ]");
+	EXPECT_TRUE(json.isArray());
+	EXPECT_EQ(json.size(), 0);
+
+	json = parseOk("[ null , false , true , 123 , \"abc\" ]");
+	EXPECT_TRUE(json.isArray());
+	EXPECT_EQ(json.size(), 5);
+	EXPECT_EQ(json[0], Json(nullptr));
+	EXPECT_EQ(json[1], Json(false));
+	EXPECT_EQ(json[2], Json(true));
+	EXPECT_EQ(json[3], Json(123.0));
+	EXPECT_EQ(json[4], Json("abc"));
+
+	json = parseOk("[ [ ] , [ 0 ] , [ 0 , 1 ] , [ 0 , 1 , 2 ] ]");
+	EXPECT_TRUE(json.isArray());
+	EXPECT_EQ(json.size(), 4);
+
+	EXPECT_TRUE(json[0].isArray());
+	EXPECT_EQ(json[0].size(), 0);
+
+	EXPECT_TRUE(json[1].isArray());
+	EXPECT_EQ(json[1].size(), 1);
+	EXPECT_EQ(json[1][0].toDouble(), 0);
+
+	EXPECT_TRUE(json[2].isArray());
+	EXPECT_EQ(json[2].size(), 2);
+	EXPECT_EQ(json[2][0].toDouble(), 0);
+	EXPECT_EQ(json[2][1].toDouble(), 1);
+
+	EXPECT_TRUE(json[3].isArray());
+	EXPECT_EQ(json[3].size(), 3);
+	EXPECT_EQ(json[3][0].toDouble(), 0);
+	EXPECT_EQ(json[3][1].toDouble(), 1);
+	EXPECT_EQ(json[3][2].toDouble(), 2);
+}
+
 TEST(Error, InvalidValue) {
 	testError("INVALID VALUE", "nul");
 	testError("INVALID VALUE", "?");
@@ -140,8 +177,53 @@ TEST(Error, RootNotSingular) {
 	testError("ROOT NOT SINGULAR", "0x123");
 }
 
-
 TEST(Error, NumberTooBig) {
 	testError("NUMBER TOO BIG", "1e309");
 	testError("NUMBER TOO BIG", "-1e309");
+}
+
+TEST(Error, MissQuotationMark) {
+	testError("MISS QUOTATION MARK", "\"");
+	testError("MISS QUOTATION MARK", "\"abc");
+}
+
+TEST(Error, InvalidStringEscape) {
+	testError("INVALID STRING ESCAPE", "\"\\v\"");
+	testError("INVALID STRING ESCAPE", "\"\\'\"");
+	testError("INVALID STRING ESCAPE", "\"\\0\"");
+	testError("INVALID STRING ESCAPE", "\"\\x12\"");
+}
+
+TEST(Error, InvalidStringChar) {
+	testError("INVALID STRING CHAR", "\"\x01\"");
+	testError("INVALID STRING CHAR", "\"\x1F\"");
+}
+
+TEST(Error, InvalidUnicodeHex) {
+	testError("INVALID UNICODE HEX", "\"\\u\"");
+	testError("INVALID UNICODE HEX", "\"\\u0\"");
+	testError("INVALID UNICODE HEX", "\"\\u01\"");
+	testError("INVALID UNICODE HEX", "\"\\u012\"");
+	testError("INVALID UNICODE HEX", "\"\\u/000\"");
+	testError("INVALID UNICODE HEX", "\"\\uG000\"");
+	testError("INVALID UNICODE HEX", "\"\\u0/00\"");
+	testError("INVALID UNICODE HEX", "\"\\u0G00\"");
+	testError("INVALID UNICODE HEX", "\"\\u000/\"");
+	testError("INVALID UNICODE HEX", "\"\\u00G/\"");
+	testError("INVALID UNICODE HEX", "\"\\u 123/\"");
+}
+
+TEST(Error, InvalidUnicodeSurrogate) {
+	testError("INVALID UNICODE SURROGATE", "\"\\uD800\"");
+	testError("INVALID UNICODE SURROGATE", "\"\\uDBFF\"");
+	testError("INVALID UNICODE SURROGATE", "\"\\uD800\\\\\\");
+	testError("INVALID UNICODE SURROGATE", "\"\\uD800\\uDBFF\"");
+	testError("INVALID UNICODE SURROGATE", "\"\\uD800\\uE000\"");
+}
+
+TEST(Error, MissCommaOrSquareBracket) {
+	testError("MISS COMMA OR SQUARE BRACKET", "[1");
+	testError("MISS COMMA OR SQUARE BRACKET", "[1}");
+	testError("MISS COMMA OR SQUARE BRACKET", "[1 2");
+	testError("MISS COMMA OR SQUARE BRACKET", "[[]");
 }

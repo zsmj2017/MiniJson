@@ -14,7 +14,7 @@ public:// uncopyable
 	Parser(Parser&) = delete;
 	Parser& operator=(Parser&) = delete;
 
-public:// only public parse
+public:// only public parse interface
 	Json parse();
 
 private:// parse interface
@@ -22,11 +22,13 @@ private:// parse interface
 	Json parseLiteral(const std::string& literal);
 	Json parseNumber();
 	Json parseString();
+	Json parseArray();
 
 private:// parse_aux interface
 	void parseWhitespace() noexcept;
 	unsigned parse4hex();
 	std::string encodeUTF8(unsigned u) noexcept;
+	// indicate the error pos
 	void error(const std::string& msg) const;
 
 private:// private data member

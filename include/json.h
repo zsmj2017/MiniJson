@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace miniJson {
 
@@ -19,6 +20,9 @@ enum class JsonType {
 class JsonValue;
 
 class Json {
+public:// alias declarations
+	using _array = std::vector<Json>;
+
 public:// ctor
 	explicit Json(std::nullptr_t);
 	explicit Json(bool);
@@ -28,6 +32,7 @@ public:// ctor
 	// string (without this ctor, Json("xx") will call Json(bool)
 	explicit Json(const char* cstr) : Json(std::string(cstr)) {}
 	explicit Json(const std::string&);
+	explicit Json(const _array&);
 
 public:// dtor
 	~Json();
@@ -43,21 +48,34 @@ public:// move constructor && assignment
 public:// static interfcae
 	// errMsg can store exception message(all exception will be catched)
 	static Json parse(const std::string& content, std::string& errMsg) noexcept;
+
 public:// type interface
 	JsonType getType() const noexcept;
 	bool isNull() const noexcept;
 	bool isBool() const noexcept;
 	bool isNumber() const noexcept;
 	bool isString() const noexcept;
+	bool isArray() const noexcept;
+	bool isObject() const noexcept;
 
 public:// convert json object into value
 	bool toBool() const;
 	double toDouble() const;
-	std::string toString() const;
+	const std::string& toString() const;
+	const _array& toArray() const;
+
+public:// interface for array && object
+	size_t size() const;
+	// operator[] for array
+	Json& operator[](size_t);
+	const Json& operator[](size_t) const;
 
 private:
 	void swap(Json&) noexcept;// make copy && swap
 	std::unique_ptr<JsonValue> _jsonValue;
 };
 
-}//namespace json
+bool operator==(const Json&, const Json&) noexcept;
+inline bool operator!=(const Json& lhs, const Json& rhs) noexcept {return !(lhs == rhs);}
+
+}//namespace miniJson
