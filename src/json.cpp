@@ -27,11 +27,6 @@ Json::Json(const Json& rhs) {
 	}
 }
 
-void Json::swap(Json& rhs) noexcept {
-	using std::swap;
-	swap(_jsonValue, rhs._jsonValue);
-}
-
 Json& Json::operator=(Json& rhs) noexcept {
 	//copy && swap
 	Json temp(rhs);
@@ -55,12 +50,26 @@ Json Json::parse(const std::string& content, std::string& errMsg) noexcept{
 	}
 }
 
+std::string Json::serialize() const noexcept{
+	switch (_jsonValue->getType()) {
+	case JsonType::Null: return "null";
+	case JsonType::Bool: return _jsonValue->toBool() ? "true" : "false";
+	case JsonType::Number:
+		char buf[32];
+		snprintf(buf, sizeof(buf), "%.17g", _jsonValue->toDouble());//enough to convert a double to a string
+		return buf;
+	case JsonType::String: return serializeString();
+	case JsonType::Array: return serializeArray();
+	default: return serializeObject();
+	}
+}
+
 // type interface
 JsonType Json::getType() const noexcept{
 	return _jsonValue->getType();
 }
 
-bool Json::isNull() const noexcept{return getType() == JsonType::Null;}
+bool Json::isNull() const noexcept{ return getType() == JsonType::Null; }
 bool Json::isBool() const noexcept { return getType() == JsonType::Bool; }
 bool Json::isNumber() const noexcept { return getType() == JsonType::Number; }
 bool Json::isString() const noexcept { return getType() == JsonType::String; }
@@ -83,6 +92,62 @@ const Json & Json::operator[](size_t pos) const { return _jsonValue->operator[](
 Json & Json::operator[](const std::string& key) { return _jsonValue->operator[](key); }
 const Json & Json::operator[](const std::string& key) const{ return _jsonValue->operator[](key); }
 
+// aux interface for copy && swap
+void Json::swap(Json& rhs) noexcept {
+	using std::swap;
+	swap(_jsonValue, rhs._jsonValue);
+}
+
+// aux interface foe serialize
+std::string Json::serializeString() const noexcept{
+	std::string res = "\"";
+	for (auto e : _jsonValue->toString()) {
+		switch (e) {
+		case '\"': res += "\\\""; break;
+		case '\\': res += "\\\\"; break;
+		case '\b': res += "\\b"; break;
+		case '\f': res += "\\f"; break;
+		case '\n': res += "\\n"; break;
+		case '\r': res += "\\r"; break;
+		case '\t': res += "\\t"; break;
+		default:
+			if (static_cast<unsigned char>(e) < 0x20) {
+				char buf[7];
+				sprintf_s(buf, "\\u%04X", e);
+				res += buf;
+			}
+			else
+				res += e;
+		}
+	}
+	return res + '"';
+}
+
+std::string Json::serializeArray() const noexcept{
+	std::string res = "[ ";
+	for (size_t i = 0; i != _jsonValue->size(); ++i) {
+		if (i > 0) 
+			res += ", ";
+		res += (*this)[i].serialize();
+	}
+	return res + " ]";
+}
+
+std::string Json::serializeObject() const noexcept{
+	std::string res = "{ ";
+	bool first = 1;// indicate now is the first object
+	for (const std::pair<std::string, Json>& p : _jsonValue->toObject()) {
+		if (first)
+			first = 0;
+		else
+			res += ", ";
+
+		res += "\"" + p.first + "\"";
+		res += ": ";
+		res += p.second.serialize();
+	}
+	return res + " }";
+}
 
 bool operator==(const Json& lhs, const Json& rhs) noexcept {
 	if (lhs.getType() != rhs.getType()) 

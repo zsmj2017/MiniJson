@@ -51,6 +51,16 @@ Json parseOk(const string& strJson) {
     EXPECT_EQ(json.toString(), expect); \
   } while (0)
 
+#define testRoundtrip(expect)                                              \
+  do {                                                                     \
+    Json json = parseOk(expect);                                           \
+    string actual = json.serialize();                                      \
+    if (json.isNumber())                                                   \
+      EXPECT_EQ(strtod(actual.c_str(), nullptr), strtod(expect, nullptr)); \
+    else                                                                   \
+      EXPECT_EQ(actual, expect);                                           \
+  } while (0)
+
 TEST(Str2Json, JsonNull) {
 	testNull("null");
 	testNull("   null\n\r\t");
@@ -191,6 +201,52 @@ TEST(Str2Json, JsonObject) {
 
 	EXPECT_TRUE(json["o"].isObject());
 	EXPECT_EQ(json["o"].size(), 3);
+}
+
+TEST(RoundTrip, literal) {
+	testRoundtrip("null");
+	testRoundtrip("true");
+	testRoundtrip("false");
+}
+
+TEST(RoundTrip, JsonNumber) {
+	testRoundtrip("0");
+	testRoundtrip("-0");
+	testRoundtrip("1");
+	testRoundtrip("-0");
+	testRoundtrip("1.5");
+	testRoundtrip("-1.5");
+	testRoundtrip("3.25");
+	testRoundtrip("1e+20");
+	testRoundtrip("1.234e+20");
+	testRoundtrip("1.234e-20");
+	testRoundtrip("1.0000000000000002");
+	testRoundtrip("4.9406564584124654e-324");
+	testRoundtrip("-4.9406564584124654e-324");
+	testRoundtrip("2.2250738585072009e-308");
+	testRoundtrip("-2.2250738585072009e-308");
+	testRoundtrip("2.2250738585072014e-308");
+	testRoundtrip("-2.2250738585072014e-308");
+	testRoundtrip("1.7976931348623157e+308");
+	testRoundtrip("-1.7976931348623157e+308");
+}
+
+TEST(RoundTrip, JsonString) {
+	testRoundtrip("\"\"");
+	testRoundtrip("\"Hello\"");
+	testRoundtrip("\"Hello\\nWorld\"");
+	testRoundtrip("\"\\\" \\\\ / \\b \\f \\n \\r \\t\"");
+	testRoundtrip("\"Hello\\u0000World\"");
+}
+
+TEST(RoundTrip, JsonArray) {
+	testRoundtrip("[  ]");
+	testRoundtrip("[ null, false, true, 123, \"abc\", [ 1, 2, 3 ] ]");
+}
+
+TEST(RoundTrip, JsonObject) {
+	testRoundtrip("{  }");
+	testRoundtrip("{ \"n\": null, \"f\": false, \"t\": true, \"i\": 123, \"a\": [ 1, 2, 3 ], \"s\": \"abc\", \"o\": { \"1\": 1, \"2\": 2, \"3\": 3 } }");
 }
 
 TEST(Error, ExpectValue) {

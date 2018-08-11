@@ -48,9 +48,10 @@ public:// move constructor && assignment
 	Json(Json&&) noexcept;
 	Json& operator=(Json&&) noexcept;
 
-public:// static interfcae
+public://  parse && serialize interface
 	// errMsg can store exception message(all exception will be catched)
 	static Json parse(const std::string& content, std::string& errMsg) noexcept;
+	std::string serialize() const noexcept;
 
 public:// type interface
 	JsonType getType() const noexcept;
@@ -77,11 +78,20 @@ public:// interface for array && object
 	Json& operator[](const std::string&);
 	const Json& operator[](const std::string&) const;
 
-private:
+private:// aux interface
 	void swap(Json&) noexcept;// make copy && swap
+	std::string serializeString() const noexcept;
+	std::string serializeArray() const noexcept;
+	std::string serializeObject() const noexcept;
+
+private:// data member
 	std::unique_ptr<JsonValue> _jsonValue;
 };
 
+// non-member function
+inline std::ostream& operator<<(std::ostream& os, const Json& json) {
+	return os << json.serialize();
+}
 bool operator==(const Json&, const Json&) noexcept;
 inline bool operator!=(const Json& lhs, const Json& rhs) noexcept {return !(lhs == rhs);}
 

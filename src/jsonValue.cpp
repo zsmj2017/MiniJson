@@ -30,13 +30,6 @@ size_t JsonValue::size() const{
 }
 
 // operator[] for array:random_access
-Json& JsonValue::operator[](size_t pos) {
-	if (std::holds_alternative<Json::_array>(_val))
-		return std::get<Json::_array>(_val)[pos];
-	else
-		throw  JsonException("not a array");
-}
-
 const Json& JsonValue::operator[](size_t pos) const {
 	if (std::holds_alternative<Json::_array>(_val))
 		return std::get<Json::_array>(_val)[pos];
@@ -44,19 +37,22 @@ const Json& JsonValue::operator[](size_t pos) const {
 		throw  JsonException("not a array");
 }
 
-// operator[] for object:O(1) search
-Json& JsonValue::operator[](const std::string &key){
-	if (std::holds_alternative<Json::_object>(_val))
-		return std::get<Json::_object>(_val).at(key);// call member function at instead of operator[]
-	else
-		throw  JsonException("not a object");
+Json& JsonValue::operator[](size_t pos) {
+	return const_cast<Json&>
+		(static_cast<const JsonValue&>(*this)[pos]);
 }
 
+// operator[] for object:O(1) search
 const Json& JsonValue::operator[](const std::string &key) const {
 	if (std::holds_alternative<Json::_object>(_val))
 		return std::get<Json::_object>(_val).at(key);
 	else
 		throw  JsonException("not a object");
+}
+
+Json& JsonValue::operator[](const std::string &key){
+	return const_cast<Json&>
+		(static_cast<const JsonValue&>(*this)[key]);
 }
 
 //convert interface
