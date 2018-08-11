@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 namespace miniJson {
 
@@ -22,6 +23,7 @@ class JsonValue;
 class Json {
 public:// alias declarations
 	using _array = std::vector<Json>;
+	using _object = std::unordered_map<std::string, Json>;
 
 public:// ctor
 	explicit Json(std::nullptr_t);
@@ -33,13 +35,14 @@ public:// ctor
 	explicit Json(const char* cstr) : Json(std::string(cstr)) {}
 	explicit Json(const std::string&);
 	explicit Json(const _array&);
+	explicit Json(const _object&);
 
 public:// dtor
 	~Json();
 
 public:// copy constructor && assignment
-	Json(const Json&);
-	Json& operator=(Json&);
+	Json(const Json&);// deeply copy
+	Json& operator=(Json&) noexcept; // copy && swap
 
 public:// move constructor && assignment
 	Json(Json&&) noexcept;
@@ -63,12 +66,16 @@ public:// convert json object into value
 	double toDouble() const;
 	const std::string& toString() const;
 	const _array& toArray() const;
+	const _object& toObject() const;
 
 public:// interface for array && object
 	size_t size() const;
 	// operator[] for array
 	Json& operator[](size_t);
 	const Json& operator[](size_t) const;
+	// operator[] for object
+	Json& operator[](const std::string&);
+	const Json& operator[](const std::string&) const;
 
 private:
 	void swap(Json&) noexcept;// make copy && swap

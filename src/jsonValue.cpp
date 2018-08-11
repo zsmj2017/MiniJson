@@ -13,30 +13,50 @@ JsonType JsonValue::getType() const {
 		return JsonType::Number;
 	else if (std::holds_alternative<std::string>(_val))
 		return JsonType::String;
-	else
+	else if (std::holds_alternative<Json::_array>(_val))
 		return JsonType::Array;
+	else
+		return JsonType::Object;
 }
 
+// interface for array and object
 size_t JsonValue::size() const{
 	if (std::holds_alternative<Json::_array>(_val))
 		return std::get<Json::_array>(_val).size();
+	else if (std::holds_alternative<Json::_object>(_val))
+		return std::get<Json::_object>(_val).size();
 	else
-		throw  JsonException("not a array or object");
-		
+		throw  JsonException("not a array or object");	
+}
+
+// operator[] for array:random_access
+Json& JsonValue::operator[](size_t pos) {
+	if (std::holds_alternative<Json::_array>(_val))
+		return std::get<Json::_array>(_val)[pos];
+	else
+		throw  JsonException("not a array");
 }
 
 const Json& JsonValue::operator[](size_t pos) const {
 	if (std::holds_alternative<Json::_array>(_val))
 		return std::get<Json::_array>(_val)[pos];
 	else
-		throw  JsonException("not a array or object");
+		throw  JsonException("not a array");
 }
 
-Json& JsonValue::operator[](size_t pos) {
-	if (std::holds_alternative<Json::_array>(_val))
-		return std::get<Json::_array>(_val)[pos];
+// operator[] for object:O(1) search
+Json& JsonValue::operator[](const std::string &key){
+	if (std::holds_alternative<Json::_object>(_val))
+		return std::get<Json::_object>(_val).at(key);// call member function at instead of operator[]
 	else
-		throw  JsonException("not a array or object");
+		throw  JsonException("not a object");
+}
+
+const Json& JsonValue::operator[](const std::string &key) const {
+	if (std::holds_alternative<Json::_object>(_val))
+		return std::get<Json::_object>(_val).at(key);
+	else
+		throw  JsonException("not a object");
 }
 
 //convert interface
@@ -82,6 +102,15 @@ const Json::_array & JsonValue::toArray() const{
 	}
 	catch (const std::bad_variant_access&) {
 		throw JsonException("not a array");
+	}
+}
+
+const Json::_object & JsonValue::toObject() const{
+	try {
+		return std::get<Json::_object>(_val);
+	}
+	catch (const std::bad_variant_access&) {
+		throw JsonException("not a object");
 	}
 }
 

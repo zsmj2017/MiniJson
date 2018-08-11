@@ -11,6 +11,7 @@ Json::Json(bool val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(double val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(const std::string& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(const _array& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
+Json::Json(const _object& val):_jsonValue(std::make_unique<JsonValue>(val)) {}
 
 Json::~Json() {}
 
@@ -22,7 +23,7 @@ Json::Json(const Json& rhs) {
 	case JsonType::Number: _jsonValue = std::make_unique<JsonValue>(rhs.toDouble()); break;
 	case JsonType::String: _jsonValue = std::make_unique<JsonValue>(rhs.toString()); break;
 	case JsonType::Array: _jsonValue = std::make_unique<JsonValue>(rhs.toArray()); break;
-	//case JsonType::Object: _jsonValue = std::make_unique<JsonValue>(rhs.toObject()); break;
+	case JsonType::Object: _jsonValue = std::make_unique<JsonValue>(rhs.toObject()); break;
 	}
 }
 
@@ -31,7 +32,7 @@ void Json::swap(Json& rhs) noexcept {
 	swap(_jsonValue, rhs._jsonValue);
 }
 
-Json& Json::operator=(Json& rhs) {
+Json& Json::operator=(Json& rhs) noexcept {
 	//copy && swap
 	Json temp(rhs);
 	swap(temp);
@@ -40,7 +41,6 @@ Json& Json::operator=(Json& rhs) {
 
 //Json's move operation=default
 Json::Json(Json&& rhs) noexcept = default;
-
 Json & Json::operator=(Json &&rhs) noexcept = default;
 
 // parse interface(static member function)
@@ -64,18 +64,25 @@ bool Json::isNull() const noexcept{return getType() == JsonType::Null;}
 bool Json::isBool() const noexcept { return getType() == JsonType::Bool; }
 bool Json::isNumber() const noexcept { return getType() == JsonType::Number; }
 bool Json::isString() const noexcept { return getType() == JsonType::String; }
-bool Json::isArray() const noexcept{ return getType() == JsonType::Array; }
+bool Json::isArray() const noexcept { return getType() == JsonType::Array; }
+bool Json::isObject() const noexcept { return getType() == JsonType::Object; }
 
 // parse interface
 bool Json::toBool() const{ return _jsonValue->toBool(); }
 double Json::toDouble() const { return _jsonValue->toDouble(); }
 const std::string& Json::toString() const { return _jsonValue->toString(); }
 const Json::_array& Json::toArray() const{ return _jsonValue->toArray(); }
+const Json::_object& Json::toObject() const{ return _jsonValue->toObject(); }
 
+// interface for array and object
 size_t Json::size() const { return _jsonValue->size(); }
-
-const Json & Json::operator[](size_t pos) const { return _jsonValue->operator[](pos); }
+// operator[] for array
 Json& Json::operator[](size_t pos) { return _jsonValue->operator[](pos); }
+const Json & Json::operator[](size_t pos) const { return _jsonValue->operator[](pos); }
+// operator[] for object
+Json & Json::operator[](const std::string& key) { return _jsonValue->operator[](key); }
+const Json & Json::operator[](const std::string& key) const{ return _jsonValue->operator[](key); }
+
 
 bool operator==(const Json& lhs, const Json& rhs) noexcept {
 	if (lhs.getType() != rhs.getType()) 
@@ -86,7 +93,7 @@ bool operator==(const Json& lhs, const Json& rhs) noexcept {
 	case JsonType::Number: return lhs.toDouble() == rhs.toDouble();
 	case JsonType::String: return lhs.toString() == rhs.toString();
 	case JsonType::Array: return lhs.toArray() == rhs.toArray();
-	//default:return
+	default:return lhs.toObject() == rhs.toObject();
 	}
 }
 

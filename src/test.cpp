@@ -155,6 +155,49 @@ TEST(Str2Json, JsonArray) {
 	EXPECT_EQ(json[3][2].toDouble(), 2);
 }
 
+TEST(Str2Json, JsonObject) {
+	Json json = parseOk("{ }");
+	EXPECT_TRUE(json.isObject());
+	EXPECT_EQ(json.size(), 0);
+
+	json = parseOk(" { "
+		"\"n\" : null , "
+		"\"f\" : false , "
+		"\"t\" : true , "
+		"\"i\" : 123 , "
+		"\"s\" : \"abc\", "
+		"\"a\" : [ 1, 2, 3 ],"
+		"\"o\" : { \"1\" : 1, \"2\" : 2, \"3\" : 3 }"
+		" } ");
+	EXPECT_TRUE(json.isObject());
+	EXPECT_EQ(json.size(), 7);
+
+	EXPECT_TRUE(json["n"].isNull());
+
+	EXPECT_TRUE(json["f"].isBool());
+	EXPECT_EQ(json["f"].toBool(), false);
+
+	EXPECT_TRUE(json["t"].isBool());
+	EXPECT_EQ(json["t"].toBool(), true);
+
+	EXPECT_TRUE(json["i"].isNumber());
+	EXPECT_EQ(json["i"].toDouble(), 123.0);
+
+	EXPECT_TRUE(json["s"].isString());
+	EXPECT_EQ(json["s"].toString(), "abc");
+
+	EXPECT_TRUE(json["a"].isArray());
+	EXPECT_EQ(json["a"].size(), 3);
+
+	EXPECT_TRUE(json["o"].isObject());
+	EXPECT_EQ(json["o"].size(), 3);
+}
+
+TEST(Error, ExpectValue) {
+	testError("EXPECT VALUE", "");
+	testError("EXPECT VALUE", " ");
+}
+
 TEST(Error, InvalidValue) {
 	testError("INVALID VALUE", "nul");
 	testError("INVALID VALUE", "?");
@@ -226,4 +269,71 @@ TEST(Error, MissCommaOrSquareBracket) {
 	testError("MISS COMMA OR SQUARE BRACKET", "[1}");
 	testError("MISS COMMA OR SQUARE BRACKET", "[1 2");
 	testError("MISS COMMA OR SQUARE BRACKET", "[[]");
+}
+
+TEST(Error, MissKey) {
+	testError("MISS KEY", "{:1,");
+	testError("MISS KEY", "{1:1,");
+	testError("MISS KEY", "{true:1,");
+	testError("MISS KEY", "{false:1,");
+	testError("MISS KEY", "{null:1,");
+	testError("MISS KEY", "{[]:1,");
+	testError("MISS KEY", "{{}:1,");
+	testError("MISS KEY", "{\"a\":1,");
+}
+
+TEST(Error, MissColon) {
+	testError("MISS COLON", "{\"a\"}");
+	testError("MISS COLON", "{\"a\",\"b\"}");
+}
+
+TEST(Error, MissCommaOrCurlyBracket) {
+	testError("MISS COMMA OR CURLY BRACKET", "{\"a\":1");
+	testError("MISS COMMA OR CURLY BRACKET", "{\"a\":1]");
+	testError("MISS COMMA OR CURLY BRACKET", "{\"a\":1 \"b\"");
+	testError("MISS COMMA OR CURLY BRACKET", "{\"a\":{}");
+}
+
+TEST(Json, Ctor) {
+	{
+		Json json(nullptr);
+		EXPECT_TRUE(json.isNull());
+	}
+	{
+		Json json(true);
+		EXPECT_TRUE(json.isBool());
+		EXPECT_EQ(json.toBool(), true);
+
+		Json json1(false);
+		EXPECT_TRUE(json1.isBool());
+		EXPECT_EQ(json1.toBool(), false);
+	}
+	{
+		Json json(0);
+		EXPECT_TRUE(json.isNumber());
+		EXPECT_EQ(json.toDouble(), 0);
+
+		Json json1(100.1);
+		EXPECT_TRUE(json1.isNumber());
+		EXPECT_EQ(json1.toDouble(), 100.1);
+	}
+	{
+		Json json("hello");
+		EXPECT_TRUE(json.isString());
+		EXPECT_EQ(json.toString(), "hello");
+	}
+	{
+		vector<Json> arr{ Json(nullptr), Json(true), Json(1.2) };
+		Json json(arr);
+		EXPECT_TRUE(json.isArray());
+		EXPECT_TRUE(json[0].isNull());
+	}
+	{
+		unordered_map<string, Json> obj;
+		obj.insert({ "hello", Json(nullptr) });
+		obj.insert({ "world", Json("!!") });
+		Json json(obj);
+		EXPECT_TRUE(json.isObject());
+		EXPECT_TRUE(json["world"].isString());
+	}
 }
