@@ -4,7 +4,7 @@ JSON is a lightweight data-interchange format. It can represent numbers, strings
 
 MiniJson is a tiny JSON library that allows manipulating JSON values, including serialization and deserialization to and from strings. 
 
-MiniJson is written in C++17 and test the code using the GoogleTest framework.The classes is heavily unit-tested and covers 100% of the code, including all exceptional behavior. 
+MiniJson is written in C++17 and test the code using the GoogleTest framework.The classes are heavily unit-tested and covers 100% of the code, including all exceptional behavior. 
 
 
 ----------
@@ -14,7 +14,7 @@ Json objects act like values. They can be assigned, copied, moved, compared for 
 
 
 ----------
-It's easy to make a JSON object:
+It's easy to construct a JSON object:
 ```C++
 vector<Json> arr{ Json(nullptr), Json(true), Json(1.2) };
 Json json(arr);
