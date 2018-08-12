@@ -20,22 +20,38 @@ enum class JsonType {
 // forward declaration for std::unique_ptr
 class JsonValue;
 
-class Json {
+class Json final{
 public:// alias declarations
 	using _array = std::vector<Json>;
 	using _object = std::unordered_map<std::string, Json>;
 
-public:// ctor
-	explicit Json(std::nullptr_t);
-	explicit Json(bool);
+public:// ctor for the various types of JSON value
+	Json(std::nullptr_t);
+	Json(bool);
 	// convert int into double
-	explicit Json(int val) : Json(1.0 * val) {}
-	explicit Json(double);
+	Json(int val) : Json(1.0 * val) {}
+	Json(double);
 	// string (without this ctor, Json("xx") will call Json(bool)
-	explicit Json(const char* cstr) : Json(std::string(cstr)) {}
-	explicit Json(const std::string&);
-	explicit Json(const _array&);
-	explicit Json(const _object&);
+	Json(const char* cstr) : Json(std::string(cstr)) {}
+	Json(const std::string&);
+	Json(std::string&&);
+	Json(const _array&);
+	Json(_array&&);
+	Json(const _object&);
+	Json(_object&&);
+
+public:// implicit ctor
+// Implicit constructor: map-like objects (std::map, std::unordered_map, etc)
+template <class M, typename std::enable_if<
+		std::is_constructible<std::string, decltype(std::declval<M>().begin()->first)>::value
+		&& std::is_constructible<Json, decltype(std::declval<M>().begin()->second)>::value,
+		int>::type = 0>
+		Json(const M & m) : Json(_object(m.begin(), m.end())) {}
+// Implicit constructor: vector-like objects (std::list, std::vector, std::set, etc)
+template <class V, typename std::enable_if<
+		std::is_constructible<Json, decltype(*std::declval<V>().begin())>::value,
+		int>::type = 0>
+		Json(const V & v) : Json(_array(v.begin(), v.end())) {}
 
 public:// dtor
 	~Json();
@@ -48,7 +64,7 @@ public:// move constructor && assignment
 	Json(Json&&) noexcept;
 	Json& operator=(Json&&) noexcept;
 
-public://  parse && serialize interface
+public:// parse && serialize interface
 	// errMsg can store exception message(all exception will be catched)
 	static Json parse(const std::string& content, std::string& errMsg) noexcept;
 	std::string serialize() const noexcept;

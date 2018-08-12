@@ -246,7 +246,7 @@ TEST(RoundTrip, JsonArray) {
 
 TEST(RoundTrip, JsonObject) {
 	testRoundtrip("{  }");
-	testRoundtrip("{ \"n\": null, \"f\": false, \"t\": true, \"i\": 123, \"a\": [ 1, 2, 3 ], \"s\": \"abc\", \"o\": { \"1\": 1, \"2\": 2, \"3\": 3 } }");
+	testRoundtrip(R"({ "n": null, "f": false, "t": true, "i": 123, "a": [ 1, 2, 3 ], "s": "abc", "o": { "1": 1, "2": 2, "3": 3 } })");
 }
 
 TEST(Error, ExpectValue) {
@@ -391,5 +391,19 @@ TEST(Json, Ctor) {
 		Json json(obj);
 		EXPECT_TRUE(json.isObject());
 		EXPECT_TRUE(json["world"].isString());
+	}
+	{
+		Json json = Json::_object{
+			{ "key1", "value1" },
+			{ "key2", false },
+			{ "key3", Json::_array{ 1, 2, 3 } },
+		};
+		EXPECT_TRUE(json.isObject());
+		EXPECT_TRUE(json["key1"].isString());
+		EXPECT_EQ(json["key1"].toString(),"value1");
+		EXPECT_TRUE(json["key2"].isBool());
+		EXPECT_EQ(json["key2"].toBool(), false);
+		EXPECT_TRUE(json["key3"].isArray());
+		EXPECT_EQ(json["key3"][1].toDouble(), 2);
 	}
 }
