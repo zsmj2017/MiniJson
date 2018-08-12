@@ -12,19 +12,19 @@ The core object provided by the library is MiniJson::Json. A Json object represe
 
 Json objects act like values. They can be assigned, copied, moved, compared for equality and so on. There are also helper methods Json::serialize, to serialize a Json to a string, and Json::parse (static) to parse a std::string or const char* as a Json object.
 
-
 ----------
-It's easy to construct a JSON object:
+We can construct a JSON object very intuitively:
 ```C++
-vector<Json> arr{ Json(nullptr), Json(true), Json(1.2) };
-Json json(arr);
+Json my_json1(nullptr);
+Json my_json2 = "string";
 
-unordered_map<string, Json> obj;
-obj.insert({ "hello", Json(nullptr) });
-obj.insert({ "world", Json("!!") });
-Json json(obj);
+Json my_json3 = Json::_object {
+    { "key1", "value1" },
+    { "key2", false },
+    { "key3", Json::_array { 1, 2, 3 } },
+};
 ```
-String can also be expressed explicitly using json::parse() easily:
+String can be expressed explicitly using Json::parse() easily:
 ```C++
 string errMsg;// store error messages when catch a exception in parse process
 auto js = Json::parse("[ null , false , true , 123 , \"abc\" ]",errmsg);
@@ -34,11 +34,10 @@ You can also get a string representation of a JSON value (serialize):
 ```C++
 auto str = js.serialize();
 ```
-Even you can try to output the json object directly:
+Even you can try to output the JSON object directly:
 ```C++
 cout << js << endl;
 ```
-
 
 ----------
 More documentation is still to come. For now, please see Json.h.
