@@ -111,4 +111,4 @@ inline std::ostream& operator<<(std::ostream& os, const Json& json) {
 bool operator==(const Json&, const Json&) noexcept;
 inline bool operator!=(const Json& lhs, const Json& rhs) noexcept {return !(lhs == rhs);}
 
-}//namespace miniJson
+}// namespace miniJson

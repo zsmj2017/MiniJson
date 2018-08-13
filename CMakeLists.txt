@@ -11,4 +11,4 @@ add_library(parse ../src/parse.cpp)
 add_library(test ../test/test.cpp)
 
 add_executable(checkJson ${CMAKE_CURRENT_LIST_DIR}/test/checkJson.cpp)
-target_link_libraries(checkJson json parse)
+target_link_libraries(checkJson json parse test)

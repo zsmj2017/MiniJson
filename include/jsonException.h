@@ -12,4 +12,5 @@ public:// interface
 	// what():Indication of exception information
 	const char* what() const noexcept override {return runtime_error::what();}
 };
+
 }// namespace miniJson

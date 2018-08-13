@@ -3,8 +3,8 @@
 
 namespace miniJson {
 
-//type interface
-JsonType JsonValue::getType() const {
+// type interface
+JsonType JsonValue::getType() const noexcept{
 	if (std::holds_alternative<nullptr_t>(_val))
 		return JsonType::Null;
 	else if (std::holds_alternative<bool>(_val))
@@ -55,7 +55,7 @@ Json& JsonValue::operator[](const std::string &key){
 		(static_cast<const JsonValue&>(*this)[key]);
 }
 
-//convert interface
+// convert interface
 nullptr_t JsonValue::toNull() const {
 	try {
 		return std::get<nullptr_t>(_val);

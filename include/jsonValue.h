@@ -25,7 +25,7 @@ public:// dtor
 	~JsonValue() = default;
 
 public:// type interface
-	JsonType getType() const;
+	JsonType getType() const noexcept;
 
 public:// interface for array and object
 	size_t size() const;
@@ -45,9 +45,9 @@ public:// convert jsonValue into value instance
 	const Json::_object& toObject() const;
 
 private:
-	//std::varient is a C++17 features,like union in C language
-	//More information can be seen in https://en.cppreference.com/w/cpp/utility/variant
+	// std::varient is a C++17 features,like union in C language
+	// More information can be seen in https://en.cppreference.com/w/cpp/utility/variant
 	std::variant<nullptr_t, bool, double,std::string,Json::_array,Json::_object> _val;
 };
 
-}
+}// namespace miniJson

@@ -5,17 +5,20 @@
 
 namespace miniJson {
 
-//Json's ctor && dtor
+// Json's ctor && dtor
 Json::Json(nullptr_t) :_jsonValue(std::make_unique<JsonValue>(nullptr)) {}
 Json::Json(bool val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(double val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(const std::string& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
+Json::Json(const std::string&& val): _jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
 Json::Json(const _array& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
+Json::Json(const _array&& val): _jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
 Json::Json(const _object& val):_jsonValue(std::make_unique<JsonValue>(val)) {}
+Json::Json(const _object&& val):_jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
 
-Json::~Json() {}
+~Json()=default;
 
-//Json's copy constructor && copy assignment
+// Json's copy constructor && copy assignment
 Json::Json(const Json& rhs) {
 	switch (rhs.getType()) {
 	case JsonType::Null: _jsonValue = std::make_unique<JsonValue>(nullptr); break;
@@ -28,13 +31,13 @@ Json::Json(const Json& rhs) {
 }
 
 Json& Json::operator=(Json& rhs) noexcept {
-	//copy && swap
+	// copy && swap
 	Json temp(rhs);
 	swap(temp);
 	return *this;
 }
 
-//Json's move operation=default
+// Json's move operation=default
 Json::Json(Json&& rhs) noexcept = default;
 Json & Json::operator=(Json &&rhs) noexcept = default;
 
