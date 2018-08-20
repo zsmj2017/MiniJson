@@ -21,12 +21,12 @@ Json::Json(const _object&& val):_jsonValue(std::make_unique<JsonValue>(std::move
 // Json's copy constructor && copy assignment
 Json::Json(const Json& rhs) {
 	switch (rhs.getType()) {
-	case JsonType::Null: _jsonValue = std::make_unique<JsonValue>(nullptr); break;
-	case JsonType::Bool: _jsonValue = std::make_unique<JsonValue>(rhs.toBool()); break;
-	case JsonType::Number: _jsonValue = std::make_unique<JsonValue>(rhs.toDouble()); break;
-	case JsonType::String: _jsonValue = std::make_unique<JsonValue>(rhs.toString()); break;
-	case JsonType::Array: _jsonValue = std::make_unique<JsonValue>(rhs.toArray()); break;
-	case JsonType::Object: _jsonValue = std::make_unique<JsonValue>(rhs.toObject()); break;
+	case JsonType::kNull: _jsonValue = std::make_unique<JsonValue>(nullptr); break;
+	case JsonType::kBool: _jsonValue = std::make_unique<JsonValue>(rhs.toBool()); break;
+	case JsonType::kNumber: _jsonValue = std::make_unique<JsonValue>(rhs.toDouble()); break;
+	case JsonType::kString: _jsonValue = std::make_unique<JsonValue>(rhs.toString()); break;
+	case JsonType::kArray: _jsonValue = std::make_unique<JsonValue>(rhs.toArray()); break;
+	case JsonType::kObject: _jsonValue = std::make_unique<JsonValue>(rhs.toObject()); break;
 	}
 }
 
@@ -55,14 +55,14 @@ Json Json::parse(const std::string& content, std::string& errMsg) noexcept{
 
 std::string Json::serialize() const noexcept{
 	switch (_jsonValue->getType()) {
-	case JsonType::Null: return "null";
-	case JsonType::Bool: return _jsonValue->toBool() ? "true" : "false";
-	case JsonType::Number:
+	case JsonType::kNull: return "null";
+	case JsonType::kBool: return _jsonValue->toBool() ? "true" : "false";
+	case JsonType::kNumber:
 		char buf[32];
 		snprintf(buf, sizeof(buf), "%.17g", _jsonValue->toDouble());//enough to convert a double to a string
 		return buf;
-	case JsonType::String: return serializeString();
-	case JsonType::Array: return serializeArray();
+	case JsonType::kString: return serializeString();
+	case JsonType::kArray: return serializeArray();
 	default: return serializeObject();
 	}
 }
@@ -72,19 +72,19 @@ JsonType Json::getType() const noexcept{
 	return _jsonValue->getType();
 }
 
-bool Json::isNull() const noexcept{ return getType() == JsonType::Null; }
-bool Json::isBool() const noexcept { return getType() == JsonType::Bool; }
-bool Json::isNumber() const noexcept { return getType() == JsonType::Number; }
-bool Json::isString() const noexcept { return getType() == JsonType::String; }
-bool Json::isArray() const noexcept { return getType() == JsonType::Array; }
-bool Json::isObject() const noexcept { return getType() == JsonType::Object; }
+bool Json::isNull() const noexcept{ return getType() == JsonType::kNull; }
+bool Json::isBool() const noexcept { return getType() == JsonType::kBool; }
+bool Json::isNumber() const noexcept { return getType() == JsonType::kNumber; }
+bool Json::isString() const noexcept { return getType() == JsonType::kString; }
+bool Json::isArray() const noexcept { return getType() == JsonType::kArray; }
+bool Json::isObject() const noexcept { return getType() == JsonType::kObject; }
 
 // parse interface
-bool Json::toBool() const{ return _jsonValue->toBool(); }
+bool Json::toBool() const { return _jsonValue->toBool(); }
 double Json::toDouble() const { return _jsonValue->toDouble(); }
 const std::string& Json::toString() const { return _jsonValue->toString(); }
-const Json::_array& Json::toArray() const{ return _jsonValue->toArray(); }
-const Json::_object& Json::toObject() const{ return _jsonValue->toObject(); }
+const Json::_array& Json::toArray() const { return _jsonValue->toArray(); }
+const Json::_object& Json::toObject() const { return _jsonValue->toObject(); }
 
 // interface for array and object
 size_t Json::size() const { return _jsonValue->size(); }

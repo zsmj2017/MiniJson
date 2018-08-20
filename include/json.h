@@ -8,12 +8,12 @@
 namespace miniJson {
 
 enum class JsonType {
-	Null,
-	Bool,
-	Number,
-	String,
-	Array,
-	Object 
+	kNull,
+	kBool,
+	kNumber,
+	kString,
+	kArray,
+	kObject 
 };
 
 // PIMPL
@@ -40,7 +40,7 @@ public:// ctor for the various types of JSON value
 	Json(const _object&);
 	Json(_object&&);
 
-public:// implicit ctor
+public:// implicit ctor for objects
 // Implicit constructor: map-like objects (std::map, std::unordered_map, etc)
 template <class M, typename std::enable_if<
 		std::is_constructible<std::string, decltype(std::declval<M>().begin()->first)>::value
