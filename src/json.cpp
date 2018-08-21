@@ -10,13 +10,13 @@ Json::Json(nullptr_t) :_jsonValue(std::make_unique<JsonValue>(nullptr)) {}
 Json::Json(bool val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(double val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(const std::string& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
-Json::Json(const std::string&& val): _jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
+Json::Json(std::string&& val): _jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
 Json::Json(const _array& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
-Json::Json(const _array&& val): _jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
+Json::Json(_array&& val): _jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
 Json::Json(const _object& val):_jsonValue(std::make_unique<JsonValue>(val)) {}
-Json::Json(const _object&& val):_jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
+Json::Json(_object&& val):_jsonValue(std::make_unique<JsonValue>(std::move(val))) {}
 
-~Json()=default;
+Json::~Json() = default;
 
 // Json's copy constructor && copy assignment
 Json::Json(const Json& rhs) {
@@ -156,11 +156,11 @@ bool operator==(const Json& lhs, const Json& rhs) noexcept {
 	if (lhs.getType() != rhs.getType()) 
 		return false;
 	switch (lhs.getType()) {
-	case JsonType::Null: return true;
-	case JsonType::Bool: return lhs.toBool() == rhs.toBool();
-	case JsonType::Number: return lhs.toDouble() == rhs.toDouble();
-	case JsonType::String: return lhs.toString() == rhs.toString();
-	case JsonType::Array: return lhs.toArray() == rhs.toArray();
+	case JsonType::kNull: return true;
+	case JsonType::kBool: return lhs.toBool() == rhs.toBool();
+	case JsonType::kNumber: return lhs.toDouble() == rhs.toDouble();
+	case JsonType::kString: return lhs.toString() == rhs.toString();
+	case JsonType::kArray: return lhs.toArray() == rhs.toArray();
 	default:return lhs.toObject() == rhs.toObject();
 	}
 }
