@@ -6,17 +6,17 @@ namespace miniJson {
 // type interface
 JsonType JsonValue::getType() const noexcept{
 	if (std::holds_alternative<nullptr_t>(_val))
-		return JsonType::Null;
+		return JsonType::kNull;
 	else if (std::holds_alternative<bool>(_val))
-		return JsonType::Bool;
+		return JsonType::kBool;
 	else if (std::holds_alternative<double>(_val))
-		return JsonType::Number;
+		return JsonType::kNumber;
 	else if (std::holds_alternative<std::string>(_val))
-		return JsonType::String;
+		return JsonType::kString;
 	else if (std::holds_alternative<Json::_array>(_val))
-		return JsonType::Array;
+		return JsonType::kArray;
 	else
-		return JsonType::Object;
+		return JsonType::kObject;
 }
 
 // interface for array and object
