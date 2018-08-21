@@ -29,13 +29,13 @@ public:// ctor for the various types of JSON value
 	Json(std::nullptr_t);
 	Json(bool);
 	// convert int into double
-    Json(int val) : Json(1.0 * val) {}
+	Json(int val) : Json(1.0 * val) {}
 	Json(double);
 	// string (without this ctor, Json("xx") will call Json(bool)
-    Json(const char* cstr) : Json(std::string(cstr)) {}
-    Json(const std::string&);
-    Json(std::string&&);
-    Json(const _array&);
+	Json(const char* cstr) : Json(std::string(cstr)) {}
+	Json(const std::string&);
+	Json(std::string&&);
+	Json(const _array&);
 	Json(_array&&);
 	Json(const _object&);
 	Json(_object&&);
