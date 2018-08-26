@@ -5,6 +5,10 @@
 
 namespace miniJson {
 
+// constexpr function to determine a char is a specified number
+constexpr bool is1to9(char ch) { return ch >= '1' && ch <= '9'; }
+constexpr bool is0to9(char ch) { return ch >= '0' && ch <= '9'; }
+
 class Parser{
 public:// ctor
 	explicit Parser(const char* cstr) noexcept:_start(cstr),_curr(cstr) {}

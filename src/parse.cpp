@@ -7,9 +7,6 @@
 
 namespace miniJson {
 
-constexpr bool is1to9(char ch) { return ch >= '1' && ch <= '9'; }
-constexpr bool is0to9(char ch) { return ch >= '0' && ch <= '9'; }
-
 // skip all whitespace
 void Parser::parseWhitespace() noexcept {
 	while (*_curr == ' ' || *_curr == '\t' || *_curr == '\r' || *_curr == '\n')
