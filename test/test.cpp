@@ -352,6 +352,10 @@ TEST(Error, MissCommaOrCurlyBracket) {
 
 TEST(Json, Ctor) {
 	{
+		Json json;
+		EXPECT_TRUE(json.isNull());
+	}
+	{
 		Json json(nullptr);
 		EXPECT_TRUE(json.isNull());
 	}
