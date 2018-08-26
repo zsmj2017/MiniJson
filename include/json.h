@@ -26,19 +26,23 @@ public:// alias declarations
 	using _object = std::unordered_map<std::string, Json>;
 
 public:// ctor for the various types of JSON value
-    Json(std::nullptr_t);
-    Json(bool);
-    // convert int into double
+	Json() :Json(nullptr) {};
+	Json(std::nullptr_t);
+	Json(bool);
+	// convert int into double
     Json(int val) : Json(1.0 * val) {}
-    Json(double);
-    // string (without this ctor, Json("xx") will call Json(bool)
+	Json(double);
+	// without this ctor, Json("xx") will call Json(bool)
     Json(const char* cstr) : Json(std::string(cstr)) {}
     Json(const std::string&);
     Json(std::string&&);
     Json(const _array&);
-    Json(_array&&);
-    Json(const _object&);
-    Json(_object&&);
+	Json(_array&&);
+	Json(const _object&);
+	Json(_object&&);
+
+	// prevents Json(some_pointer) from accidentally producing a bool.
+	Json(void *) = delete;
 
 public:// implicit ctor for objects
 // Implicit constructor: map-like objects (std::map, std::unordered_map, etc)
