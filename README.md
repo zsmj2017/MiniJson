@@ -44,5 +44,6 @@ cout << js << endl;
 
 ----------
 This work is inspired by https://github.com/miloyip/json-tutorial and https://github.com/Yuan-Hang/Json.
+
 More documentation is still to come. For now, please see Json.h.
 
