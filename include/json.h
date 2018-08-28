@@ -112,7 +112,7 @@ private:// data member
 inline std::ostream& operator<<(std::ostream& os, const Json& json) {
 	return os << json.serialize();
 }
-bool operator==(const Json&, const Json&) noexcept;
-inline bool operator!=(const Json& lhs, const Json& rhs) noexcept {return !(lhs == rhs);}
+bool operator==(const Json&, const Json&);
+inline bool operator!=(const Json& lhs, const Json& rhs){return !(lhs == rhs);}
 
 }// namespace miniJson

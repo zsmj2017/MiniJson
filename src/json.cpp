@@ -152,7 +152,7 @@ std::string Json::serializeObject() const noexcept{
 	return res + " }";
 }
 
-bool operator==(const Json& lhs, const Json& rhs) noexcept {
+bool operator==(const Json& lhs, const Json& rhs){
 	if (lhs.getType() != rhs.getType()) 
 		return false;
 	switch (lhs.getType()) {
