@@ -6,7 +6,7 @@ PROJECT(MiniJson)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 AUX_SOURCE_DIRECTORY(src DIR_SRCS)
 
-add_library(json ../src/json.cpp)
+add_library(json ../src/json.cpp ../src/jsonValue.cpp)
 add_library(parse ../src/parse.cpp)
 add_library(unitTest ../test/test.cpp)
 

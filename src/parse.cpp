@@ -17,7 +17,7 @@ void Parser::parseWhitespace() noexcept {
 unsigned Parser::parse4hex() {
 	unsigned u = 0;
 	for (int i = 0; i != 4; ++i) {
-		unsigned ch = static_cast<unsigned>(toupper(*++_curr));
+		auto ch = static_cast<unsigned>(toupper(*++_curr));
 		u <<= 4;
 		if (ch >= '0' && ch <= '9')
 			u |= (ch - '0');
@@ -54,7 +54,7 @@ std::string Parser::encodeUTF8(unsigned u) noexcept {
 
 std::string Parser::parseRawString() {
 	std::string str;
-	while (1) {
+	while (true) {
 		switch (*++_curr) {
 		case '\"': _start = ++_curr; return str;
 		case '\0':
@@ -115,7 +115,7 @@ Json Parser::parseValue() {
 
 Json Parser::parseLiteral(const std::string & literal){
 	// try to parse null && true && false
-	if (strncmp(_curr, literal.c_str(), literal.size())) 
+	if (strncmp(_curr, literal.c_str(), literal.size()) != 0)
 		error("INVALID VALUE");
 	_curr += literal.size();
 	_start = _curr;
@@ -169,7 +169,7 @@ Json Parser::parseArray(){
 		_start = ++_curr;
 		return Json(arr);
 	}
-	while (1) {
+	while (true) {
 		parseWhitespace();
 		arr.push_back(parseValue());// recursive
 		parseWhitespace();
@@ -192,7 +192,7 @@ Json Parser::parseObject(){
 		_start = ++_curr;
 		return Json(obj);
 	}
-	while (1) {
+	while (true) {
 		parseWhitespace();
 		if (*_curr != '"') 
 			error("MISS KEY");

@@ -32,7 +32,7 @@ Json::Json(const Json& rhs) {
 }
 
 // Json's copy assignment
-Json& Json::operator=(Json& rhs) noexcept {
+Json& Json::operator=(const Json& rhs) noexcept {
 	// copy && swap
 	Json temp(rhs);
 	swap(temp);
@@ -62,7 +62,7 @@ std::string Json::serialize() const noexcept{
 	case JsonType::kNumber:
 		char buf[32];
 		snprintf(buf, sizeof(buf), "%.17g", _jsonValue->toDouble());//enough to convert a double to a string
-		return buf;
+		return std::string(buf);
 	case JsonType::kString: return serializeString();
 	case JsonType::kArray: return serializeArray();
 	default: return serializeObject();
@@ -140,13 +140,12 @@ std::string Json::serializeArray() const noexcept{
 
 std::string Json::serializeObject() const noexcept{
 	std::string res = "{ ";
-	bool first = 1;// indicate now is the first object
-	for (const std::pair<std::string, Json>& p : _jsonValue->toObject()) {
+	bool first = true;// indicate now is the first object
+	for (auto&& p : _jsonValue->toObject()) {
 		if (first)
-			first = 0;
+			first = false;
 		else
 			res += ", ";
-
 		res += "\"" + p.first + "\"";
 		res += ": ";
 		res += p.second.serialize();
