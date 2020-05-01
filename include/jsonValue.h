@@ -9,7 +9,7 @@ namespace miniJson {
 //Implement class:JsonValue
 class JsonValue {
 public:// ctor
-	explicit JsonValue(nullptr_t) :_val(nullptr) {}
+	explicit JsonValue(std::nullptr_t) :_val(nullptr) {}
 	explicit JsonValue(bool val) :_val(val) {}
 	explicit JsonValue(double val) :_val(val) {}
 	explicit JsonValue(const std::string& val):_val(val){}
@@ -37,7 +37,7 @@ public:// interface for array and object
 	Json& operator[](const std::string&);
 
 public:// convert jsonValue into value instance 
-	nullptr_t toNull() const;
+	std::nullptr_t toNull() const;
 	bool toBool() const;
 	double toDouble() const;
 	const std::string& toString() const;
@@ -47,7 +47,7 @@ public:// convert jsonValue into value instance
 private:
 	// std::varient is a C++17 features,like union in C language
 	// More information can be seen in https://en.cppreference.com/w/cpp/utility/variant
-	std::variant<nullptr_t, bool, double,std::string,Json::_array,Json::_object> _val;
+	std::variant<std::nullptr_t, bool, double,std::string,Json::_array,Json::_object> _val;
 };
 
 }// namespace miniJson

@@ -1,12 +1,13 @@
 #include "json.h"
 #include "parse.h"
 #include "jsonValue.h"
+#include <cstdio>
 
 
 namespace miniJson {
 
 // Json's ctor && dtor
-Json::Json(nullptr_t) :_jsonValue(std::make_unique<JsonValue>(nullptr)) {}
+Json::Json(std::nullptr_t) :_jsonValue(std::make_unique<JsonValue>(nullptr)) {}
 Json::Json(bool val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(double val) : _jsonValue(std::make_unique<JsonValue>(val)) {}
 Json::Json(const std::string& val): _jsonValue(std::make_unique<JsonValue>(val)) {}
@@ -18,7 +19,7 @@ Json::Json(_object&& val):_jsonValue(std::make_unique<JsonValue>(std::move(val))
 
 Json::~Json() = default;
 
-// Json's copy constructor && copy assignment
+// Json's copy constructor
 Json::Json(const Json& rhs) {
 	switch (rhs.getType()) {
 	case JsonType::kNull: _jsonValue = std::make_unique<JsonValue>(nullptr); break;
@@ -30,6 +31,7 @@ Json::Json(const Json& rhs) {
 	}
 }
 
+// Json's copy assignment
 Json& Json::operator=(Json& rhs) noexcept {
 	// copy && swap
 	Json temp(rhs);
@@ -39,7 +41,7 @@ Json& Json::operator=(Json& rhs) noexcept {
 
 // Json's move operation=default
 Json::Json(Json&& rhs) noexcept = default;
-Json & Json::operator=(Json &&rhs) noexcept = default;
+Json& Json::operator=(Json &&rhs) noexcept = default;
 
 // parse interface(static member function)
 Json Json::parse(const std::string& content, std::string& errMsg) noexcept{
@@ -101,7 +103,7 @@ void Json::swap(Json& rhs) noexcept {
 	swap(_jsonValue, rhs._jsonValue);
 }
 
-// aux interface foe serialize
+// aux interface for serialize
 std::string Json::serializeString() const noexcept{
 	std::string res = "\"";
 	for (auto e : _jsonValue->toString()) {
@@ -116,7 +118,7 @@ std::string Json::serializeString() const noexcept{
 		default:
 			if (static_cast<unsigned char>(e) < 0x20) {
 				char buf[7];
-				sprintf_s(buf, "\\u%04X", e);
+				sprintf(buf, "\\u%04X", e);
 				res += buf;
 			}
 			else
