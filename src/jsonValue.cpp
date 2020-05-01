@@ -5,7 +5,7 @@ namespace miniJson {
 
 // type interface
 JsonType JsonValue::getType() const noexcept{
-	if (std::holds_alternative<nullptr_t>(_val))
+	if (std::holds_alternative<std::nullptr_t>(_val))
 		return JsonType::kNull;
 	else if (std::holds_alternative<bool>(_val))
 		return JsonType::kBool;
@@ -56,9 +56,9 @@ Json& JsonValue::operator[](const std::string &key){
 }
 
 // convert interface
-nullptr_t JsonValue::toNull() const {
+std::nullptr_t JsonValue::toNull() const {
 	try {
-		return std::get<nullptr_t>(_val);
+		return std::get<std::nullptr_t>(_val);
 	}
 	catch (const std::bad_variant_access&) {
 		throw JsonException("not a null");
