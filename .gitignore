@@ -5,6 +5,9 @@ cmake-build-debug/
 # MacOS DS_Store
 .DS_Store
 
+# GoogleTest
+/gtest/
+
 # Prerequisites
 *.d
 
