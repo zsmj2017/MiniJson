@@ -22,12 +22,33 @@ Json::~Json() = default;
 // Json's copy constructor
 Json::Json(const Json& rhs) {
 	switch (rhs.getType()) {
-	case JsonType::kNull: _jsonValue = std::make_unique<JsonValue>(nullptr); break;
-	case JsonType::kBool: _jsonValue = std::make_unique<JsonValue>(rhs.toBool()); break;
-	case JsonType::kNumber: _jsonValue = std::make_unique<JsonValue>(rhs.toDouble()); break;
-	case JsonType::kString: _jsonValue = std::make_unique<JsonValue>(rhs.toString()); break;
-	case JsonType::kArray: _jsonValue = std::make_unique<JsonValue>(rhs.toArray()); break;
-	case JsonType::kObject: _jsonValue = std::make_unique<JsonValue>(rhs.toObject()); break;
+	    case JsonType::kNull: {
+	        _jsonValue = std::make_unique<JsonValue>(nullptr);
+	        break;
+	    }
+	    case JsonType::kBool: {
+	        _jsonValue = std::make_unique<JsonValue>(rhs.toBool());
+	        break;
+	    }
+	    case JsonType::kNumber: {
+	        _jsonValue = std::make_unique<JsonValue>(rhs.toDouble());
+	        break;
+	    }
+	    case JsonType::kString: {
+	        _jsonValue = std::make_unique<JsonValue>(rhs.toString());
+	        break;
+	    }
+	    case JsonType::kArray: {
+	        _jsonValue = std::make_unique<JsonValue>(rhs.toArray());
+	        break;
+	    }
+	    case JsonType::kObject: {
+	        _jsonValue = std::make_unique<JsonValue>(rhs.toObject());
+	        break;
+	    }
+        default: {
+            break;
+        }
 	}
 }
 
@@ -74,7 +95,7 @@ JsonType Json::getType() const noexcept{
 	return _jsonValue->getType();
 }
 
-bool Json::isNull() const noexcept{ return getType() == JsonType::kNull; }
+bool Json::isNull() const noexcept { return getType() == JsonType::kNull; }
 bool Json::isBool() const noexcept { return getType() == JsonType::kBool; }
 bool Json::isNumber() const noexcept { return getType() == JsonType::kNumber; }
 bool Json::isString() const noexcept { return getType() == JsonType::kString; }
@@ -95,7 +116,7 @@ Json& Json::operator[](size_t pos) { return _jsonValue->operator[](pos); }
 const Json & Json::operator[](size_t pos) const { return _jsonValue->operator[](pos); }
 // operator[] for object
 Json & Json::operator[](const std::string& key) { return _jsonValue->operator[](key); }
-const Json & Json::operator[](const std::string& key) const{ return _jsonValue->operator[](key); }
+const Json & Json::operator[](const std::string& key) const { return _jsonValue->operator[](key); }
 
 // aux interface for copy && swap
 void Json::swap(Json& rhs) noexcept {
@@ -131,8 +152,9 @@ std::string Json::serializeString() const noexcept{
 std::string Json::serializeArray() const noexcept{
 	std::string res = "[ ";
 	for (size_t i = 0; i != _jsonValue->size(); ++i) {
-		if (i > 0) 
+		if (i > 0) {
 			res += ", ";
+		}
 		res += (*this)[i].serialize();
 	}
 	return res + " ]";
@@ -142,10 +164,11 @@ std::string Json::serializeObject() const noexcept{
 	std::string res = "{ ";
 	bool first = true;// indicate now is the first object
 	for (auto&& p : _jsonValue->toObject()) {
-		if (first)
+		if (first) {
 			first = false;
-		else
+		} else {
 			res += ", ";
+		}
 		res += "\"" + p.first + "\"";
 		res += ": ";
 		res += p.second.serialize();
@@ -154,15 +177,31 @@ std::string Json::serializeObject() const noexcept{
 }
 
 bool operator==(const Json& lhs, const Json& rhs){
-	if (lhs.getType() != rhs.getType()) 
+	if (lhs.getType() != rhs.getType()) {
 		return false;
+	}
 	switch (lhs.getType()) {
-	case JsonType::kNull: return true;
-	case JsonType::kBool: return lhs.toBool() == rhs.toBool();
-	case JsonType::kNumber: return lhs.toDouble() == rhs.toDouble();
-	case JsonType::kString: return lhs.toString() == rhs.toString();
-	case JsonType::kArray: return lhs.toArray() == rhs.toArray();
-	default:return lhs.toObject() == rhs.toObject();
+		case JsonType::kNull: {
+			return true;
+		}
+		case JsonType::kBool: {
+			return lhs.toBool() == rhs.toBool();
+		}
+		case JsonType::kNumber: {
+			return lhs.toDouble() == rhs.toDouble();
+		}
+		case JsonType::kString: {
+			return lhs.toString() == rhs.toString();
+		}
+		case JsonType::kArray: {
+			return lhs.toArray() == rhs.toArray();
+		}
+		case JsonType::kObject: {
+			return lhs.toObject() == rhs.toObject();
+		}
+		default:{
+			return false;
+		}
 	}
 }
 
