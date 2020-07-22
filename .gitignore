@@ -41,3 +41,7 @@ cmake-build-debug/
 *.out
 *.app
 
+# tool scripts
+.clang-format
+codeFormat.sh
+cppLint.sh
